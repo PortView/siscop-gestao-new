@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 import UserMenu from "../user/UserMenu";
 
 const menus = [
@@ -54,15 +55,24 @@ export default function MenuTopo() {
                   <div className="absolute left-0 mt-0 w-64 bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700 rounded-b z-20 animate-fade-in">
                     <ul className="py-2">
                       {menu.submenu.map((item) => (
-                        <li key={item.label}>
-                          <a
-                            href={item.href}
-                            className="block px-6 py-2 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-[15px]"
-                          >
-                            {item.label}
-                          </a>
-                        </li>
-                      ))}
+  <li key={item.label}>
+    {item.label === "Controle de Processos" ? (
+      <Link
+        href="/gerencia/process-control"
+        className="block px-6 py-2 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-[15px]"
+      >
+        {item.label}
+      </Link>
+    ) : (
+      <a
+        href={item.href}
+        className="block px-6 py-2 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-[15px]"
+      >
+        {item.label}
+      </a>
+    )}
+  </li>
+  ))}
                     </ul>
                   </div>
                 )}
