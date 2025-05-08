@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ProcessCommandPanel } from "@/components/gerencia/process-command-panel";
+import { ProcessCommandPanel } from "@/components/gerencia/process-command-panel-new";
 import { ProcessFilterPanel } from "@/components/gerencia/process-filter-panel-new";
 import { TableServicos } from "@/components/gerencia/table-servicos";
 import { TableFollowup } from "@/components/gerencia/table-followup";

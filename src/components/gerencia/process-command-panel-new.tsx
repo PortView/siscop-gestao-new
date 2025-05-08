@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { SiscopCliente, SiscopUnidade } from '@/lib/types';
@@ -10,7 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchClientes, fetchUnidades } from '@/lib/api-service';
 import { LOCAL_STORAGE_TOKEN_KEY, LOCAL_STORAGE_USER_KEY } from '@/lib/constants';
 import { FileText, Edit, AlertCircle, DollarSign, ShoppingCart, ClipboardList, Trash2, AlertTriangle, RefreshCw, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/toast-provider';
 import { ApiParamDialog } from '@/components/api-param-dialog';
 
 interface ProcessCommandPanelProps {
@@ -18,7 +18,7 @@ interface ProcessCommandPanelProps {
   onUnitChange?: (unit: SiscopUnidade) => void;
 }
 
-export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: ProcessCommandPanelProps) {
+export function ProcessCommandPanel({ onClientChange, onUnitChange }: ProcessCommandPanelProps) {
     // Hook de toast
       const toast = useToast();
   // Referências para controle de processamento
@@ -113,8 +113,8 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
   // UFs disponíveis para o cliente selecionado
   const ufs = useMemo(() => {
     if (!selectedClient) return [];
-    const clientData = clients.find(c => c.codcli === selectedClient);
-    return clientData?.lc_ufs?.map(u => u.uf) || [];
+    const clientData = clients.find((c: SiscopCliente) => c.codcli === selectedClient);
+    return clientData?.lc_ufs?.map((u: any) => u.uf) || [];
   }, [selectedClient, clients]);
 
   // Listas filtradas para os dropdowns (filtragem ocorre apenas após 3 caracteres)
@@ -123,7 +123,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
     // Retornar todos os clientes se o termo de busca for vazio ou tiver menos de 3 caracteres
     if (!trimmedTerm || trimmedTerm.length < 3) return clients;
     // Aplicar filtro apenas se tiver 3 ou mais caracteres
-    return clients.filter(client => 
+    return clients.filter((client: SiscopCliente) => 
       client.fantasia.toLowerCase().includes(trimmedTerm.toLowerCase())
     );
   }, [clients, clientSearchTerm]);
@@ -133,7 +133,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
     // Retornar todas as UFs se o termo de busca for vazio ou tiver menos de 3 caracteres
     if (!trimmedTerm || trimmedTerm.length < 3) return ufs;
     // Aplicar filtro apenas se tiver 3 ou mais caracteres
-    return ufs.filter(uf => 
+    return ufs.filter((uf: string) => 
       uf.toLowerCase().includes(trimmedTerm.toLowerCase())
     );
   }, [ufs, ufSearchTerm]);
@@ -211,7 +211,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
       // Sempre forçar recarga de dados (sem usar cache) para garantir dados atualizados
       // Independente se é troca de cliente, UF ou não
       const options = { skipCache: true };
-      const response = await fetchUnidades(params, options);
+      const response = await fetchUnidades(params);
       
       if (!response?.folowups) {
         setUnits([]);
@@ -241,11 +241,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
       
       // Verificar se há unidades
       if (response.folowups.length === 0) {
-        toast({
-          title: 'Nenhuma unidade encontrada',
-          description: `Não há unidades para este cliente na UF ${uf}.`,
-          variant: 'default',
-        });
+        toast(`Nenhuma unidade encontrada. Não há unidades para este cliente na UF ${uf}.`);
         processingRef.current = false;
         setSelectedUnit(null); // Garantir que nenhuma unidade esteja selecionada
         return null;
@@ -264,11 +260,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
     } catch (error) {
       console.error('Erro ao buscar unidades:', error);
       setUnitsError(error as Error);
-      toast({
-        title: 'Erro ao buscar unidades',
-        description: `${(error as Error).message || 'Erro desconhecido ao buscar unidades.'}`,
-        variant: 'destructive',
-      });
+      toast(`Erro ao buscar unidades: ${(error as Error).message || 'Erro desconhecido ao buscar unidades.'}`);
       processingRef.current = false;
       setSelectedUnit(null); // Garantir que nenhuma unidade esteja selecionada em caso de erro
       return null;
@@ -280,11 +272,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
   // Handler para recarregar unidades manualmente (botão "Tentar novamente")
   const refetchUnits = useCallback(() => {
     if (!selectedClient || !selectedUF) {
-      toast({
-        title: 'Parâmetros incompletos',
-        description: 'Cliente e UF são necessários para buscar unidades.',
-        variant: 'destructive',
-      });
+      toast('Parâmetros incompletos. Cliente e UF são necessários para buscar unidades.');
       return;
     }
     
@@ -313,7 +301,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
     };
     
     // Força o refresh do cache
-    fetchUnidades(params, { skipCache: true })
+    fetchUnidades(params)
       .then(response => {
         if (response?.folowups) {
           setUnits(response.folowups);
@@ -338,11 +326,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
       })
       .catch(error => {
         setUnitsError(error as Error);
-        toast({
-          title: 'Erro ao buscar unidades',
-          description: `${(error as Error).message || 'Erro desconhecido ao buscar unidades.'}`,
-          variant: 'destructive',
-        });
+        toast('Erro ao buscar unidades: ' + (error as Error).message);
       })
       .finally(() => {
         setIsLoadingUnits(false);
@@ -387,7 +371,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
     setUnits([]);
     
     // Encontrar a primeira UF do novo cliente selecionado e defini-la imediatamente
-    const clientData = clients.find(c => c.codcli === codcli);
+    const clientData = clients.find((c: any) => c.codcli === codcli);
     if (clientData?.lc_ufs?.length) {
       const firstClientUF = clientData.lc_ufs[0].uf;
       console.log(`Cliente alterado para ${codcli}, definindo primeira UF: ${firstClientUF}`);
@@ -456,95 +440,40 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
         {/* Primeira linha: Cliente, UF, Todas UFs, Planilhas, Contratos ----- bg-blue-200  bg-[#bfdbfe] */}
         <div className="flex items-center gap-2">
           {/* Cliente */}
-          <Select
-            disabled={isLoadingClients}
-            onValueChange={(value) => {
-              // Usar a função handleClientChange para garantir consistência
-              handleClientChange(Number(value));
-            }}
-          >
-            <SelectTrigger className="h-8 text-xs w-[380px] bg-select text-select-foreground border-border">
-              <SelectValue placeholder="Cliente" />
-            </SelectTrigger>
-            <SelectContent className="z-50 fixed w-[380px] max-h-[var(--radix-select-content-available-height)] overflow-hidden rounded-md border border-slate-500 bg-popover text-popover-foreground shadow-md">
-              <div className="px-2 py-2">
-                <Input
-                  placeholder="Buscar cliente... (min. 3 letras)"
-                  value={clientSearchTerm}
-                  onChange={(e) => {
-                    // Manter a referência ao input atual
-                    const inputElement = e.target;
-                    setClientSearchTerm(e.target.value);
-                    
-                    // Manter o foco no input após atualizar o valor
-                    setTimeout(() => {
-                      if (inputElement) {
-                        inputElement.focus();
-                      }
-                    }, 0);
-                  }}
-                  className="h-8 mb-2 bg-zink-100 border-slate-600"
-                />
-              </div>
-              {filteredClients.length > 0 ? (
-                filteredClients.map((client) => (
-                  <SelectItem key={client.codcli} value={client.codcli.toString()}>
-                    {client.fantasia}
-                  </SelectItem>
-                ))
-              ) : (
-                <div className="px-2 py-1 text-xs text-muted-foreground">
-                  Nenhum cliente encontrado
-                </div>
-              )}
-            </SelectContent>
-          </Select>
+          <select
+  disabled={isLoadingClients}
+  className="h-8 text-xs w-[380px] bg-select text-select-foreground border-border rounded-md"
+  value={selectedClient || ''}
+  onChange={e => handleClientChange(Number(e.target.value))}
+>
+  <option value="" disabled>Selecione um cliente</option>
+  {filteredClients.length > 0 ? (
+    filteredClients.map((client: any) => (
+      <option key={client.codcli} value={client.codcli.toString()}>
+        {client.fantasia}
+      </option>
+    ))
+  ) : (
+    <option value="" disabled>Nenhum cliente encontrado</option>
+  )}
+</select>
           
           {/* UF - Dropdown com seleção real */}
-          <Select
-            disabled={!selectedClient || ufs.length === 0 || allUfs}
-            value={selectedUF || undefined}
-            onValueChange={(value) => {
-              console.log('UF selecionada manualmente:', value);
-              handleUFChange(value);
-            }}
-          >
-            <SelectTrigger className="h-8 text-xs w-[100px] border-border bg-select text-select-foreground">
-              <SelectValue placeholder="UF" />
-            </SelectTrigger>
-            <SelectContent className="z-50 w-[30px] overflow-hidden rounded-md border border-slate-500 bg-popover text-popover-foreground shadow-md">
-              <div className="px-2 py-2">
-                <Input
-                  placeholder="Buscar UF"
-                  value={ufSearchTerm}
-                  onChange={(e) => {
-                    // Manter a referência ao input atual
-                    const inputElement = e.target;
-                    setUfSearchTerm(e.target.value);
-                    
-                    // Manter o foco no input após atualizar o valor
-                    setTimeout(() => {
-                      if (inputElement) {
-                        inputElement.focus();
-                      }
-                    }, 0);
-                  }}
-                  className="h-8 mb-2 bg-zink-100 border-slate-600"
-                />
-              </div>
-              {filteredUfs.length > 0 ? (
-                filteredUfs.map((uf) => (
-                  <SelectItem key={uf} value={uf}>
-                    {uf}
-                  </SelectItem>
-                ))
-              ) : (
-                <div className="px-2 py-1 text-xs text-muted-foreground">
-                  Nenhuma UF encontrada
-                </div>
-              )}
-            </SelectContent>
-          </Select>
+          <select
+  disabled={!selectedClient || ufs.length === 0 || allUfs}
+  className="h-8 text-xs w-[100px] border-border bg-select text-select-foreground rounded-md"
+  value={selectedUF || ''}
+  onChange={e => handleUFChange(e.target.value)}
+>
+  <option value="" disabled>Selecione UF</option>
+  {ufs.length > 0 ? (
+    ufs.map((uf: string) => (
+      <option key={uf} value={uf}>{uf}</option>
+    ))
+  ) : (
+    <option value="" disabled>Nenhuma UF encontrada</option>
+  )}
+</select>
           
           {/* Checkbox Todas UFs */}
           <div className="flex items-center h-8 px-2">
@@ -552,7 +481,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
               id="todas-ufs" 
               checked={allUfs}
               disabled={!selectedClient} 
-              onCheckedChange={(checked) => {
+              onChange={(checked: any) => {
                 const isChecked = !!checked;
                 setAllUfs(isChecked);
                 
@@ -570,7 +499,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
                     
                     setIsLoadingUnits(true);
                     // Forçar requisição nova ao mudar o filtro para todas UFs
-                    fetchUnidades(params, { skipCache: true })
+                    fetchUnidades(params)
                       .then(response => {
                         if (response?.folowups) {
                           setUnits(response.folowups);
@@ -600,11 +529,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
                       })
                       .catch(error => {
                         setUnitsError(error as Error);
-                        toast({
-                          title: 'Erro ao buscar unidades',
-                          description: `${(error as Error).message || 'Erro desconhecido ao buscar unidades.'}`,
-                          variant: 'destructive',
-                        });
+                        toast(`Erro ao buscar unidades: ${(error as Error).message || 'Erro desconhecido ao buscar unidades.'}`);
                       })
                       .finally(() => {
                         setIsLoadingUnits(false);
@@ -621,7 +546,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
                   
                   setIsLoadingUnits(true);
                   // Forçar requisição nova ao desmarcar "Todas UFs"
-                  fetchUnidades(params, { skipCache: true })
+                  fetchUnidades(params)
                     .then(response => {
                       if (response?.folowups) {
                         setUnits(response.folowups);
@@ -651,11 +576,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
                     })
                     .catch(error => {
                       setUnitsError(error as Error);
-                      toast({
-                        title: 'Erro ao buscar unidades',
-                        description: `${(error as Error).message || 'Erro desconhecido ao buscar unidades.'}`,
-                        variant: 'destructive',
-                      });
+                      toast(`Erro ao buscar unidades: ${(error as Error).message || 'Erro desconhecido ao buscar unidades.'}`);
                     })
                     .finally(() => {
                       setIsLoadingUnits(false);
@@ -669,7 +590,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
           
           {/* Botão Planilhas */}
           <Button 
-            variant="outline" 
+            variant="default" 
             size="sm" 
             className="h-8 bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200"
           >
@@ -679,7 +600,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
           
           {/* Botão Contrato */}
           <Button 
-            variant="outline" 
+            variant="default" 
             size="sm" 
             className="h-8 bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200"
           >
@@ -695,7 +616,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
               <span className="text-red-500 text-xs">Erro ao carregar unidades</span>
               <div className="flex items-center gap-2">
                 <Button 
-                  variant="outline" 
+                  variant="default" 
                   size="sm" 
                   className="h-8 bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200"
                   onClick={() => refetchUnits()}
@@ -707,70 +628,29 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Select
+              <select
                 disabled={((!selectedUF && !allUfs) || isLoadingUnits || (units as SiscopUnidade[]).length === 0)}
-                value={selectedUnit ? `${selectedUnit.contrato}-${selectedUnit.codend}` : undefined}
-                onValueChange={(value) => {
+                className="h-8 text-xs w-[450px] border-slate-500 bg-select text-select-foreground border-border rounded-md"
+                value={selectedUnit ? `${selectedUnit.contrato}-${selectedUnit.codend}` : ''}
+                onChange={e => {
+                  const value = e.target.value;
                   const unit = (units as SiscopUnidade[]).find((u: SiscopUnidade) => u.contrato + '-' + u.codend === value);
                   if (unit) {
                     setSelectedUnit(unit);
                   }
                 }}
               >
-                <SelectTrigger id="unidades" className="h-8 text-xs w-[450px] border-slate-500 bg-select text-select-foreground border-border">
-                  {isLoadingUnits ? (
-                    <div className="flex items-center gap-2">
-                      <RefreshCw className="h-3 w-3 animate-spin" />
-                      <span>Carregando...</span>
-                    </div>
-                  ) : (
-                    <SelectValue placeholder="Unidades" />
-                  )}
-                </SelectTrigger>
-                <SelectContent className="z-50 fixed w-[510px] overflow-hidden rounded-md border border-slate-500 bg-popover text-popover-foreground shadow-md">
-                  <div className="px-2 py-2">
-                    <Input
-                      placeholder="Buscar unidade... (min. 3 letras)"
-                      value={unitSearchTerm}
-                      onChange={(e) => {
-                        // Manter a referência ao input atual
-                        const inputElement = e.target;
-                        setUnitSearchTerm(e.target.value);
-                        
-                        // Manter o foco no input após atualizar o valor
-                        setTimeout(() => {
-                          if (inputElement) {
-                            inputElement.focus();
-                          }
-                        }, 0);
-                      }}
-                      className="h-8 mb-2 bg-zink-100 border-slate-600"
-                    />
-                  </div>
-                  {filteredUnits.length > 0 ? (
-                    filteredUnits.map((unit) => (
-                      <SelectItem key={`${unit.contrato}-${unit.codend}`} value={`${unit.contrato}-${unit.codend}`}>
-                        {`${unit.contrato} - ${unit.cadimov?.uf || ''} - ${unit.cadimov?.tipo || ''}`}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <div className="px-2 py-1 text-xs text-muted-foreground">
-                      Nenhuma unidade encontrada
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-              
-              {/* <div className="flex gap-1">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-8 bg-green-100 border-green-300 text-green-800 hover:bg-green-200"
-                  onClick={showParamsDialog}
-                >
-                  Verificar parâmetros
-                </Button>
-              </div> */}
+                <option value="" disabled>Selecione uma unidade</option>
+                {filteredUnits.length > 0 ? (
+                  filteredUnits.map((unit) => (
+                    <option key={`${unit.contrato}-${unit.codend}`} value={`${unit.contrato}-${unit.codend}`}>
+                      {`${unit.contrato} - ${unit.cadimov?.uf || ''} - ${unit.cadimov?.tipo || ''}`}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>Nenhuma unidade encontrada</option>
+                )}
+              </select>
             </div>
           )}
           
@@ -779,8 +659,8 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
             <div className="flex items-center gap-[2px] ml-2">
               {/* Primeira página */}
               <Button 
-                variant="outline" 
-                size="icon" 
+                variant="default" 
+                size="sm" 
                 className="h-8 w-8 bg-blue-700 border-blue-600 text-white p-0 hover:bg-blue-800"
                 disabled={currentPage === 1 || isLoadingUnits}
                 onClick={() => loadPagedUnits(1)}
@@ -790,8 +670,8 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
               
               {/* Página anterior */}
               <Button 
-                variant="outline" 
-                size="icon" 
+                variant="default" 
+                size="sm" 
                 className="h-8 w-8 bg-blue-700 border-blue-600 text-white p-0 hover:bg-blue-800"
                 disabled={currentPage === 1 || isLoadingUnits}
                 onClick={() => loadPagedUnits(currentPage - 1)}
@@ -808,8 +688,8 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
               
               {/* Próxima página */}
               <Button 
-                variant="outline" 
-                size="icon" 
+                variant="default" 
+                size="sm" 
                 className="h-8 w-8 bg-blue-700 border-blue-600 text-white p-0 hover:bg-blue-800"
                 disabled={currentPage === totalPages || isLoadingUnits}
                 onClick={() => loadPagedUnits(currentPage + 1)}
@@ -819,8 +699,8 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
               
               {/* Última página */}
               <Button 
-                variant="outline" 
-                size="icon" 
+                variant="default" 
+                size="sm" 
                 className="h-8 w-8 bg-blue-700 border-blue-600 text-white p-0 hover:bg-blue-800"
                 disabled={currentPage === totalPages || isLoadingUnits}
                 onClick={() => loadPagedUnits(totalPages)}
@@ -845,11 +725,7 @@ export function ProcessCommandPanelNew({ onClientChange, onUnitChange }: Process
                       // Limpar o input após navegar
                       input.value = '';
                     } else {
-                      toast({
-                        title: 'Página inválida',
-                        description: `Informe um número entre 1 e ${totalPages}`,
-                        variant: 'destructive',
-                      });
+                      toast(`Página inválida. Informe um número entre 1 e ${totalPages}`);
                     }
                   }
                 }}

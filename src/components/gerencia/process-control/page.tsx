@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { ProcessCommandPanel } from "@/components/gerencia/process-command-panel";
+import { ToastProvider } from "@/components/ui/toast-provider";
+import { ProcessCommandPanel } from "@/components/gerencia/process-command-panel-new";
 import { ProcessFilterPanel } from "@/components/gerencia/process-filter-panel-new";
 import { TableServicos } from "@/components/gerencia/table-servicos";
 import { TableFollowup } from "@/components/gerencia/table-followup";
@@ -93,7 +94,8 @@ export default function ProcessControlPage() {
   };
 
   return (
-    // <div className="bg-zinc-400 dark:bg-zinc-800 text-foreground min-h-screen">
+    <ToastProvider>
+      {/* <div className="bg-zinc-400 dark:bg-zinc-800 text-foreground min-h-screen"> */}
       <div className="bg-zinc-600 text-white min-h-screen">
       {/* Conteúdo principal que ocupa a largura total */}
       <div className="w-full mx-auto px-1 pb-1">
@@ -112,7 +114,7 @@ export default function ProcessControlPage() {
                 />
               </div>
               <div className="w-[940px] h-[150px]"> {/* Added bg-card */}
-                <ProcessFilterPaneln />
+                <ProcessFilterPanel />
               </div>
             </div>
 
@@ -190,5 +192,6 @@ export default function ProcessControlPage() {
         </div>
       </div>
     </div>
+    </ToastProvider>
   );
 }
