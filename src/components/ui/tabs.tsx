@@ -20,8 +20,11 @@ export function Tabs({ defaultValue, value, orientation = "horizontal", classNam
     <div className={cn(orientation === "vertical" ? "flex flex-row" : "flex flex-col", className)}>
       {Children.map(children, (child) => {
         if (!isValidElement(child)) return child;
-        // Injeta activeTab e setActiveTab nos filhos
-        return cloneElement(child as any, { activeTab, setActiveTab, orientation });
+        // Injeta activeTab e setActiveTab apenas em componentes customizados, nunca em elementos DOM
+        const isCustom = typeof child.type !== 'string';
+        return isCustom
+          ? cloneElement(child as any, { activeTab, setActiveTab, orientation })
+          : child;
       })}
     </div>
   );

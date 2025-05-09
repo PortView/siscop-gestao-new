@@ -294,7 +294,7 @@ export function ProcessFilterPanel() {
             <Checkbox
               id="servNaoConcluidos"
               checked={servNaoConcluidos}
-              // onCheckedChange={(value: boolean) => setServNaoConcluidos(value)}
+              onChange={e => setServNaoConcluidos(e.target.checked)}
             />
             <Label
               htmlFor="servNaoConcluidos"

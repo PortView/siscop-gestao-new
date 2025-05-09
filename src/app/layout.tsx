@@ -17,7 +17,9 @@ const geistMono = Geist_Mono({
 import MenuTopo from "@/components/menu-topo/MenuTopo";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ThemeProvider } from "./theme-provider";
+import { useTheme } from "next-themes";
 
 export default function RootLayout({
   children,
@@ -27,32 +29,33 @@ export default function RootLayout({
   const [queryClient] = useState(() => new QueryClient());
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
   const isLogin = pathname.startsWith('/login');
+
+  // Fallback para evitar hydration flash
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
-    <html lang="pt-BR">
-      <head>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            try {
-              const theme = localStorage.getItem('theme');
-              if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-              } else {
-                document.documentElement.classList.remove('dark');
-              }
-            } catch { /* ignore */ }
-          `,
-        }} />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {!isLogin && <MenuTopo />}
-        {/** Provider do React Query engloba toda a aplicação para hooks useQuery/useMutation */}
-        <QueryClientProvider client={queryClient}>
-          <ToastProvider>
-            <main>{children}</main>
-          </ToastProvider>
-        </QueryClientProvider>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <head />
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ThemeProvider attribute="class" enableSystem defaultTheme="system">
+          {mounted ? (
+            <>
+              {!isLogin && <MenuTopo />}
+              <QueryClientProvider client={queryClient}>
+                <ToastProvider>
+                  <main>{children}</main>
+                </ToastProvider>
+              </QueryClientProvider>
+            </>
+          ) : (
+            <div className="w-screen h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+              <span className="animate-spin w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full"></span>
+            </div>
+          )}
+        </ThemeProvider>
       </body>
     </html>
   );
