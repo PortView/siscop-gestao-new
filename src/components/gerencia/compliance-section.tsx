@@ -62,16 +62,17 @@ export function ComplianceSectionNew({ selectedClient, selectedUnit }: Complianc
 
     <div className="bg-[#d0e0f0] border-none shadow-md w-full rounded-l-none">
     <CardContent className="p-2">
-      <div className="flex justify-between items-end mb-2">
+      <div className="flex justify-between items-end mb-2 mt-2">
         <div className="flex items-center gap-4">
           <div className="flex flex-row items-center gap-1">
-            <Label htmlFor="cnpj" className="text-xs text-black font-medium">CNPJ</Label>
+            {/* <Label htmlFor="cnpj" className="text-xs text-red-500 font-medium z-50">CNPJ</Label> */}
+            <div className="text-xs text-zinc-950 font-medium z-50">CNPJ</div>
             <Select
               id="cnpj"
               disabled={!selectedClient || cnpjs.length === 0}
               value={cnpj ?? ""}
               onChange={e => setCnpj(e.target.value)}
-              className="h-7 text-xs w-52"
+              className="h-10 text-xs w-52"
             >
               <option value="" disabled>
                 Selecione um CNPJ
@@ -87,24 +88,24 @@ export function ComplianceSectionNew({ selectedClient, selectedUnit }: Complianc
           <div className="flex items-center space-x-1">
             <Checkbox
               id="onlyForReport"
-              checked={onlyForReport}
+              checked={false}
               onChange={e => setOnlyForReport(e.target.checked)}
               className="h-3 w-3"
             />
-            <Label htmlFor="onlyForReport" className="text-xs text-black">Somente p/ relatório</Label>
+            <div className="text-xs text-zinc-950">Somente p/ relatório</div>
           </div>
         </div>
 
-        <div className="flex gap-1">
-          <Button variant="secondary" size="sm" className="h-7 py-0 px-2 bg-green-100 border-green-300 text-green-800 hover:bg-green-200 text-xs">
+        <div className="flex gap-1 h-10">
+          <Button variant="secondary" className="h-10 py-0 px-2 bg-green-100 border-green-300 text-green-800 hover:bg-green-200 text-xs">
             <Plus className="h-3 w-3 mr-1" />
             Inserir
           </Button>
-          <Button variant="secondary" size="sm" className="h-7 py-0 px-2 bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200 text-xs">
+          <Button variant="secondary" className="h-10 py-0 px-2 bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200 text-xs">
             <Edit className="h-3 w-3 mr-1" />
             Editar
           </Button>
-          <Button variant="danger" size="sm" className="h-7 py-0 px-2 bg-red-100 border-red-300 text-red-800 hover:bg-red-200 text-xs">
+          <Button variant="danger" className="h-10 py-0 px-2 bg-red-100 border-red-300 text-red-800 hover:bg-red-200 text-xs">
             <Trash2 className="h-3 w-3 mr-1" />
             Excluir
           </Button>

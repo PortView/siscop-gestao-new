@@ -60,12 +60,7 @@ export function ProcessCommandPanel({ onClientChange, onUnitChange }: ProcessCom
   if (typeof window !== 'undefined') {
     const tokenKey = LOCAL_STORAGE_TOKEN_KEY;
     const tokenVal = localStorage.getItem(tokenKey);
-    console.log('[DEBUG][TOKEN][FORCE] LOCAL_STORAGE_TOKEN_KEY:', tokenKey);
-  console.log('[DEBUG][TOKEN][FORCE] Valor do token:', tokenVal);
-  if (!(window as any).__token_debug_shown) {
-    alert(`TOKEN_KEY: ${tokenKey}\nToken: ${tokenVal ? tokenVal.substring(0, 32) + '...' : 'NULO'}`);
-    (window as any).__token_debug_shown = true;
-  }
+
 }
 
   useEffect(() => {
@@ -74,23 +69,22 @@ export function ProcessCommandPanel({ onClientChange, onUnitChange }: ProcessCom
     // DEBUG: Exibir chave e valor do token na tela e no console
     const tokenKey = LOCAL_STORAGE_TOKEN_KEY;
     const tokenVal = localStorage.getItem(tokenKey);
-    console.log('[DEBUG][TOKEN] LOCAL_STORAGE_TOKEN_KEY:', tokenKey);
-    console.log('[DEBUG][TOKEN] Valor do token:', tokenVal);
+  
     // Exibir no DOM para debug visual
-    const debugDiv = document.createElement('div');
-    debugDiv.style.position = 'fixed';
-    debugDiv.style.bottom = '30px';
-    debugDiv.style.left = '50%';
-    debugDiv.style.transform = 'translateX(-50%)';
-    debugDiv.style.background = '#222';
-    debugDiv.style.color = '#fff';
-    debugDiv.style.padding = '10px 20px';
-    debugDiv.style.zIndex = '9999';
-    debugDiv.style.fontSize = '14px';
-    debugDiv.style.borderRadius = '8px';
-    debugDiv.innerText = `TOKEN_KEY: ${tokenKey}\nToken: ${tokenVal ? tokenVal.substring(0, 16) + '...' : 'NULO'}`;
-    document.body.appendChild(debugDiv);
-    setTimeout(() => debugDiv.remove(), 8000);
+    // const debugDiv = document.createElement('div');
+    // debugDiv.style.position = 'fixed';
+    // debugDiv.style.bottom = '30px';
+    // debugDiv.style.left = '50%';
+    // debugDiv.style.transform = 'translateX(-50%)';
+    // debugDiv.style.background = '#222';
+    // debugDiv.style.color = '#fff';
+    // debugDiv.style.padding = '10px 20px';
+    // debugDiv.style.zIndex = '9999';
+    // debugDiv.style.fontSize = '14px';
+    // debugDiv.style.borderRadius = '8px';
+    // debugDiv.innerText = `TOKEN_KEY: ${tokenKey}\nToken: ${tokenVal ? tokenVal.substring(0, 16) + '...' : 'NULO'}`;
+    // document.body.appendChild(debugDiv);
+    // setTimeout(() => debugDiv.remove(), 8000);
 
     // Ao carregar a página, o checkbox deve estar unchecked e desabilitado
     setAllUfs(false);

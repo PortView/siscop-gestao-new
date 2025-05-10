@@ -20,6 +20,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { ThemeProvider } from "./theme-provider";
 import { useTheme } from "next-themes";
+import { usePathname } from "next/navigation";
 
 export default function RootLayout({
   children,
@@ -27,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [queryClient] = useState(() => new QueryClient());
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const pathname = usePathname();
   const isLogin = pathname.startsWith('/login');
 
   // Fallback para evitar hydration flash
