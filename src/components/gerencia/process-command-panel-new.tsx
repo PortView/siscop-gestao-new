@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { SiscopCliente, SiscopUnidade } from '@/lib/types';
@@ -57,9 +56,42 @@ export function ProcessCommandPanel({ onClientChange, onUnitChange }: ProcessCom
   const [shouldShowPagination, setShouldShowPagination] = useState(false);
   
   // Carregar dados do usuário uma única vez e inicializar estados
+  // DEBUG FORÇADO: Mostra token no console e em alert ao montar componente
+  if (typeof window !== 'undefined') {
+    const tokenKey = LOCAL_STORAGE_TOKEN_KEY;
+    const tokenVal = localStorage.getItem(tokenKey);
+    console.log('[DEBUG][TOKEN][FORCE] LOCAL_STORAGE_TOKEN_KEY:', tokenKey);
+  console.log('[DEBUG][TOKEN][FORCE] Valor do token:', tokenVal);
+  if (!(window as any).__token_debug_shown) {
+    alert(`TOKEN_KEY: ${tokenKey}\nToken: ${tokenVal ? tokenVal.substring(0, 32) + '...' : 'NULO'}`);
+    (window as any).__token_debug_shown = true;
+  }
+}
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
+    // DEBUG: Exibir chave e valor do token na tela e no console
+    const tokenKey = LOCAL_STORAGE_TOKEN_KEY;
+    const tokenVal = localStorage.getItem(tokenKey);
+    console.log('[DEBUG][TOKEN] LOCAL_STORAGE_TOKEN_KEY:', tokenKey);
+    console.log('[DEBUG][TOKEN] Valor do token:', tokenVal);
+    // Exibir no DOM para debug visual
+    const debugDiv = document.createElement('div');
+    debugDiv.style.position = 'fixed';
+    debugDiv.style.bottom = '30px';
+    debugDiv.style.left = '50%';
+    debugDiv.style.transform = 'translateX(-50%)';
+    debugDiv.style.background = '#222';
+    debugDiv.style.color = '#fff';
+    debugDiv.style.padding = '10px 20px';
+    debugDiv.style.zIndex = '9999';
+    debugDiv.style.fontSize = '14px';
+    debugDiv.style.borderRadius = '8px';
+    debugDiv.innerText = `TOKEN_KEY: ${tokenKey}\nToken: ${tokenVal ? tokenVal.substring(0, 16) + '...' : 'NULO'}`;
+    document.body.appendChild(debugDiv);
+    setTimeout(() => debugDiv.remove(), 8000);
+
     // Ao carregar a página, o checkbox deve estar unchecked e desabilitado
     setAllUfs(false);
     
@@ -86,28 +118,31 @@ export function ProcessCommandPanel({ onClientChange, onUnitChange }: ProcessCom
     }
   }, []);
   
-  // Query para carregar clientes (com cache e retry)
-  const { 
-    data: clients = [], 
-    isLoading: isLoadingClients 
+  // Query para carregar clientes (API real, sem mock, conforme consumo-de-apis.md)
+  const {
+    data: clients = [],
+    isLoading: isLoadingClients,
+    isError: isErrorClients,
+    error: clientsError
   } = useQuery<SiscopCliente[]>({
     queryKey: ['siscop-clientes', codCoor],
     queryFn: async () => {
       if (!codCoor) return [];
-      
       const token = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
-      if (!token) return [];
-
+      if (!token) throw new Error('Token de acesso não encontrado.');
       try {
-        return await fetchClientes(codCoor) || [];
-      } catch (error) {
-        console.error('Erro ao buscar clientes:', error);
-        return [];
+        // fetchClientes já envia o token e codcoor corretamente
+        const result = await fetchClientes(codCoor);
+        if (!Array.isArray(result)) throw new Error('Resposta inesperada da API de clientes.');
+        return result;
+      } catch (error: any) {
+        toast('Erro ao buscar clientes: ' + (error?.message || 'Erro desconhecido'), { variant: 'destructive' });
+        throw error;
       }
     },
     enabled: !!codCoor,
-    staleTime: 5 * 60 * 1000, // Cache por 5 minutos
-    retry: 1,                 // Tentar novamente apenas uma vez em caso de falha
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   });
 
   // UFs disponíveis para o cliente selecionado

@@ -18,7 +18,7 @@ interface ComplianceSectionProps {
   selectedUnit?: SiscopUnidade | null;
 }
 
-export function ComplianceSection({ selectedClient, selectedUnit }: ComplianceSectionProps) {
+export function ComplianceSectionNew({ selectedClient, selectedUnit }: ComplianceSectionProps) {
   // CNPJ selecionado
   const [cnpj, setCnpj] = useState<string | null>(null);
   // Checkbox para relatório
@@ -59,75 +59,78 @@ export function ComplianceSection({ selectedClient, selectedUnit }: ComplianceSe
   }, [selectedClient, cnpj, onlyForReport]);
 
   return (
+
     <div className="bg-[#d0e0f0] border-none shadow-md w-full rounded-l-none">
-      <CardContent className="p-2">
-        <div className="flex justify-between items-end mb-2">
-          <div className="flex items-center gap-4">
-            <div className="flex flex-row items-center gap-1">
-              <Label htmlFor="cnpj" className="text-xs text-black font-medium">CNPJ</Label>
-<Select
-  id="cnpj"
-  disabled={!selectedClient || cnpjs.length === 0}
-  value={cnpj ?? ""}
-  onChange={e => setCnpj(e.target.value)}
-  className="h-7 text-xs w-52"
->
-  <option value="" disabled>
-    Selecione um CNPJ
-  </option>
-  {cnpjs.map((item) => (
-    <option key={item} value={item} className="text-xs">
-      {item}
-    </option>
-  ))}
-</Select>
-            </div>
-            
-            <div className="flex items-center space-x-1">
-              <Checkbox 
-  id="onlyForReport" 
-  checked={onlyForReport}
-  onChange={e => setOnlyForReport(e.target.checked)}
-  className="h-3 w-3"
-/>
-              <Label htmlFor="onlyForReport" className="text-xs text-black">Somente p/ relatório</Label>
-            </div>
+    <CardContent className="p-2">
+      <div className="flex justify-between items-end mb-2">
+        <div className="flex items-center gap-4">
+          <div className="flex flex-row items-center gap-1">
+            <Label htmlFor="cnpj" className="text-xs text-black font-medium">CNPJ</Label>
+            <Select
+              id="cnpj"
+              disabled={!selectedClient || cnpjs.length === 0}
+              value={cnpj ?? ""}
+              onChange={e => setCnpj(e.target.value)}
+              className="h-7 text-xs w-52"
+            >
+              <option value="" disabled>
+                Selecione um CNPJ
+              </option>
+              {cnpjs.map((item) => (
+                <option key={item} value={item} className="text-xs">
+                  {item}
+                </option>
+              ))}
+            </Select>
           </div>
-          
-          <div className="flex gap-1">
-            <Button variant="secondary" size="sm" className="h-7 py-0 px-2 bg-green-100 border-green-300 text-green-800 hover:bg-green-200 text-xs">
-  <Plus className="h-3 w-3 mr-1" />
-  Inserir
-</Button>
-<Button variant="secondary" size="sm" className="h-7 py-0 px-2 bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200 text-xs">
-  <Edit className="h-3 w-3 mr-1" />
-  Editar
-</Button>
-<Button variant="danger" size="sm" className="h-7 py-0 px-2 bg-red-100 border-red-300 text-red-800 hover:bg-red-200 text-xs">
-  <Trash2 className="h-3 w-3 mr-1" />
-  Excluir
-</Button>
+
+          <div className="flex items-center space-x-1">
+            <Checkbox
+              id="onlyForReport"
+              checked={onlyForReport}
+              onChange={e => setOnlyForReport(e.target.checked)}
+              className="h-3 w-3"
+            />
+            <Label htmlFor="onlyForReport" className="text-xs text-black">Somente p/ relatório</Label>
           </div>
         </div>
-        
-        <div className="rounded-l-none rounded-r-md border overflow-hidden">
-          {!selectedUnit ? (
-            <div className="flex items-center justify-center p-20 h-[430px]">
-              <p className="text-md text-zinc-900">Selecione uma unidade para visualizar os documentos de conformidade.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto w-full">
-              <TableConform 
-                codimov={selectedUnit?.codend || 0}
-                web={false}
-                relatorio={true}
-                cnpj=""
-                temcnpj={false}
-              />
-            </div>
-          )}
+
+        <div className="flex gap-1">
+          <Button variant="secondary" size="sm" className="h-7 py-0 px-2 bg-green-100 border-green-300 text-green-800 hover:bg-green-200 text-xs">
+            <Plus className="h-3 w-3 mr-1" />
+            Inserir
+          </Button>
+          <Button variant="secondary" size="sm" className="h-7 py-0 px-2 bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200 text-xs">
+            <Edit className="h-3 w-3 mr-1" />
+            Editar
+          </Button>
+          <Button variant="danger" size="sm" className="h-7 py-0 px-2 bg-red-100 border-red-300 text-red-800 hover:bg-red-200 text-xs">
+            <Trash2 className="h-3 w-3 mr-1" />
+            Excluir
+          </Button>
         </div>
-      </CardContent>
-    </div>
+      </div>
+
+      <div className="rounded-l-none rounded-r-md border overflow-hidden">
+        {!selectedUnit ? (
+          <div className="flex items-center justify-center p-20 h-[430px]">
+            <p className="text-md text-zinc-900">Selecione uma unidade para visualizar os documentos de conformidade.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto w-full">
+            <TableConform
+              codimov={selectedUnit?.codend || 0}
+              web={false}
+              relatorio={true}
+              cnpj=""
+              temcnpj={false}
+            />
+          </div>
+        )}
+      </div>
+    </CardContent>
+  </div>
+
+
   );
 }
