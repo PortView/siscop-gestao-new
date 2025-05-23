@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { API_SERVICOS_URL } from '../../lib/env';
 import { LOCAL_STORAGE_TOKEN_KEY } from '@/lib/constants';
-import { fetchServicos  } from '@/lib/api-service';
+import { fetchServicos } from '@/lib/api-service';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -40,13 +40,13 @@ interface TableServicosProps {
   onSelectServico?: (codccontra: number) => void;
 }
 
-export function TableServicos({ 
-  qcodCoor, 
-  qcontrato, 
-  qUnidade, 
-  qConcluido, 
-  qCodServ, 
-  qStatus, 
+export function TableServicos({
+  qcodCoor,
+  qcontrato,
+  qUnidade,
+  qConcluido,
+  qCodServ,
+  qStatus,
   qDtlimite,
   onSelectServico
 }: TableServicosProps) {
@@ -57,9 +57,9 @@ export function TableServicos({
   const [codServ, setCodServ] = useState<string>("-1");
   const [status, setStatus] = useState<string>("ALL");
   const [dtLimite, setDtLimite] = useState<string>("ALL");
-  const [concluido, setConcluido] = useState<boolean>(true); 
-  const [forceUpdate, setForceUpdate] = useState(false); 
-  const [services, setServices] = useState<ServicosData[]>([]); 
+  const [concluido, setConcluido] = useState<boolean>(true);
+  const [forceUpdate, setForceUpdate] = useState(false);
+  const [services, setServices] = useState<ServicosData[]>([]);
 
   // Função para buscar dados da API
   const fetchData = async () => {
@@ -68,16 +68,16 @@ export function TableServicos({
       console.log('TableServicos: Contrato ou unidade não selecionados, cancelando busca');
       setLoading(false);
       setData([]);
-      setSelectedRow(null); 
-      setServices([]); 
+      setSelectedRow(null);
+      setServices([]);
       return;
     }
 
     try {
       setLoading(true);
       setError(null);
-      setSelectedRow(null); 
-      setServices([]); 
+      setSelectedRow(null);
+      setServices([]);
 
       // Obter o token do localStorage
       const token = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
@@ -89,12 +89,12 @@ export function TableServicos({
       }
 
       console.log('TableServicos: Buscando serviços com parâmetros:', {
-        qcodCoor, 
-        qcontrato, 
-        qUnidade, 
+        qcodCoor,
+        qcontrato,
+        qUnidade,
         qConcluido,
-        codServ, 
-        status, 
+        codServ,
+        status,
         dtLimite
       });
 
@@ -115,8 +115,8 @@ export function TableServicos({
 
       if (Array.isArray(response)) {
         setData(response);
-        setServices(response); 
-        
+        setServices(response);
+
         // Selecionar automaticamente o primeiro serviço da lista, se disponível- Eu Mudei para codccontra
         if (response.length > 0 && onSelectServico) {
           setTimeout(() => {
@@ -128,12 +128,12 @@ export function TableServicos({
       } else {
         console.error('Resposta da API não é um array:', response);
         setData([]);
-        setServices([]); 
+        setServices([]);
       }
     } catch (err) {
       console.error('Erro ao carregar serviços:', err);
       setError(err instanceof Error ? err.message : 'Erro ao carregar dados do serviço');
-      setServices([]); 
+      setServices([]);
     } finally {
       setLoading(false);
     }
@@ -165,7 +165,7 @@ export function TableServicos({
       setCodServ("-1");
       setStatus("ALL");
       setDtLimite("ALL");
-      setConcluido(true); 
+      setConcluido(true);
 
       setForceUpdate(prev => !prev);
     };
@@ -248,35 +248,35 @@ export function TableServicos({
   };
 
   const columnWidths = [
-    60, 
-    60,  
-    350, 
-    26,  
-    26,  
-    30,  
-    30,  
-    40,  
-    36,  
-    36,  
-    40,  
-    150, 
-    40,  
-    80,  
-    60,  
-    60,  
-    400, 
-    400, 
+    60,
+    60,
+    350,
+    26,
+    26,
+    30,
+    30,
+    40,
+    36,
+    36,
+    40,
+    150,
+    40,
+    80,
+    60,
+    60,
+    400,
+    400,
   ];
 
   return (
-      <div className="bg-[#d0e0f0] border-none shadow-md w-full h-[460px] rounded-sm">
+    <div className="bg-[#d0e0f0] border-none shadow-md w-full h-[460px] rounded-sm">
       <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
-        <div style={{ 
-          overflowX: 'auto', 
-          overflowY: 'auto', 
-          maxHeight: '460px', 
-          position: 'relative', 
-          WebkitOverflowScrolling: 'touch', 
+        <div style={{
+          overflowX: 'auto',
+          overflowY: 'auto',
+          maxHeight: '460px',
+          position: 'relative',
+          WebkitOverflowScrolling: 'touch',
           willChange: 'transform'
         }}>
           <div style={{ display: 'inline-block', minWidth: '100%', textAlign: 'center' }}>
@@ -314,21 +314,22 @@ export function TableServicos({
                       </tr>
                     ) : (
                       data.map((item, index) => (
-                        <tr 
-                          key={index} 
-                          style={{ 
-                            fontSize: '12px', 
-                            cursor: 'pointer', 
+                        <tr
+                          key={index}
+                          style={{
+                            fontSize: '12px',
+                            cursor: 'pointer',
                             borderBottom: '1px solid #eee',
                             backgroundColor: selectedRow === item.codccontra ? '#e6f7ff' : '#fff'
-                          }} 
+                          }}
                           className="hover:bg-slate-100"
                           onClick={() => handleRowClick(item.codccontra)}
                         >
                           <td className='hidden' style={{ width: `${columnWidths[0]}px`, zIndex: 150, padding: '4px 0', textAlign: 'center', backgroundColor: selectedRow === item.codccontra ? '#e6f7ff' : '#fff' }}>
-                            <div style={{ width: '100%', textAlign: 'center' }}>{item.codccontra}</div></td>
+                            <div style={{ width: '100%', textAlign: 'center' }}>{item.codccontra}</div>
+                          </td>
 
-                            <td style={{ width: `${columnWidths[1]}px`, zIndex: 150, padding: '4px 0', textAlign: 'center', backgroundColor: selectedRow === item.codccontra ? '#e6f7ff' : '#fff' }}>
+                          <td style={{ width: `${columnWidths[1]}px`, zIndex: 150, padding: '4px 0', textAlign: 'center', backgroundColor: selectedRow === item.codccontra ? '#e6f7ff' : '#fff' }}>
                             <div style={{ width: '100%', textAlign: 'center' }}>{item.codServ}</div>
                           </td>
                           <td style={{ width: `${columnWidths[2]}px`, zIndex: 150, padding: '4px 0', textAlign: 'center', backgroundColor: selectedRow === item.codccontra ? '#e6f7ff' : '#fff' }}>

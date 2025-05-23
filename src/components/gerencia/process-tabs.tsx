@@ -1,9 +1,7 @@
 "use client";
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ComplianceSectionNew } from './compliance-section';
 import { SiscopCliente, SiscopUnidade } from '@/lib/types';
-import TableConform from './table-conform';
 
 interface ProcessTabsProps {
   selectedClient: SiscopCliente | null;
@@ -18,7 +16,8 @@ export function ProcessTabs({ selectedClient, selectedUnit }: ProcessTabsProps) 
       key: 'conformidade',
       label: 'Conformidades',
       content: (
-        <div className="max-w-[1860px] min-w-[1860px] h-full flex flex-col items-start justify-start p-0 overflow-x-auto">
+        // <div className="w-full h-full flex flex-col items-center justify-center p-0 overflow-x-auto">
+        <div className="max-w-[1860px] min-w-[1860px] h-full flex flex-col items-left p-0 overflow-x-auto">
           <ComplianceSectionNew selectedClient={selectedClient} selectedUnit={selectedUnit} />
         </div>
       ),
@@ -29,9 +28,9 @@ export function ProcessTabs({ selectedClient, selectedUnit }: ProcessTabsProps) 
   ];
 
   return (
-    <>
+    <div className="flex flex-col items-center justify-center w-full">
       {/* EXEMPLO: TABS VERTICAIS TAILWIND PURO */}
-      <div className="flex w-[1890px] h-[520px] ml-1 mb-8 rounded-lg overflow-hidden border border-blue-100 bg-[#f5f7fa] dark:bg-zinc-800 shadow">
+      <div className="flex flex-row justify-center w-[1886px] h-[540px] mb-8 rounded-[4px] overflow-hidden border border-blue-100 bg-[#f5f7fa] dark:bg-zinc-800 shadow">
         {/* Lista de abas com labels na vertical */}
         <div className="flex flex-col w-10 bg-[#d0e0f0] dark:bg-zinc-900 border-r border-blue-200 items-center justify-start">
           {tabs.map(tab => (
@@ -59,6 +58,6 @@ export function ProcessTabs({ selectedClient, selectedUnit }: ProcessTabsProps) 
       </div>
 
 
-    </>
+    </div>
   );
 }

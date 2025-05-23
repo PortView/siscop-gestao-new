@@ -16,6 +16,7 @@ interface ConformidadeData {
   codcfor: number;
   descr: string;
   doc: string;
+  docscani: boolean;
   area: string;
   dt: string;
   dtvenc: string | null;
@@ -62,7 +63,7 @@ export default function TableConform({ codimov, web, relatorio, cnpj, temcnpj }:
 
         // Construir a URL com todos os parâmetros
         const url = `${API_CONFORMIDADE_URL}?codimov=${codimov}&web=${web}&relatorio=${relatorio}&cnpj=${cnpj}&temcnpj=${temcnpj}`;
-        
+
         console.log('Buscando conformidades com URL:', url);
 
         // Fazer a requisição usando o ApiService
@@ -84,7 +85,7 @@ export default function TableConform({ codimov, web, relatorio, cnpj, temcnpj }:
         setLoading(false);
       }
     };
-    
+
     // Só fazer a requisição se tivermos o codimov
     if (codimov) {
       fetchData();
@@ -120,7 +121,7 @@ export default function TableConform({ codimov, web, relatorio, cnpj, temcnpj }:
       </Alert>
     );
   }
-  
+
   if (!codimov) {
     return (
       <div className="p-4 bg-[#d0e0f0] backdrop-blur shadow-md w-full h-[460px] overflow-hidden flex items-center justify-center rounded-md">
@@ -168,7 +169,7 @@ export default function TableConform({ codimov, web, relatorio, cnpj, temcnpj }:
   };
 
   return (
-    <div style={{ width: '100%'}}>
+    <div style={{ width: '100%' }}>
       <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
         <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: '460px', position: 'relative', WebkitOverflowScrolling: 'touch', willChange: 'transform' }}>
           <div style={{ display: 'inline-block', minWidth: '100%', textAlign: 'center' }}>
@@ -208,7 +209,17 @@ export default function TableConform({ codimov, web, relatorio, cnpj, temcnpj }:
                       </tr>
                     ) : (
                       data.map((item, index) => (
-                        <tr key={index} style={{ fontSize: '12px', cursor: 'pointer' }}>
+                        <tr 
+                        key={index} 
+                        style={{ 
+                          fontSize: '12px', 
+                          cursor: 'pointer',
+                          borderBottom: '1px solid #b2b2b2', // Adicionado para separar as linhas
+                          // borderSpacing: '0 2px',
+                          // borderCollapse: 'separate',
+                          // border: '1px solid #b2b2b2',
+                          height: '38px',
+                          }}>
                           <td style={{ position: 'sticky', left: 0, width: `${columnWidths[0]}px`, zIndex: 150, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff' }}>
                             <div style={{ display: 'flex', justifyContent: 'center' }}>
                               <Checkbox checked={item.finternet} disabled className="h-3 w-3 data-[disabled]:opacity-100" />
@@ -231,20 +242,37 @@ export default function TableConform({ codimov, web, relatorio, cnpj, temcnpj }:
                               <Checkbox checked={item.flagtipopdf} disabled className="h-3 w-3 data-[disabled]:opacity-100" />
                             </div>
                           </td>
-                          <td style={{ position: 'sticky', left: `${getLeftPosition(6)}px`, width: `${columnWidths[6]}px`, zIndex: 150, padding: '4px 0', textAlign: 'left', backgroundColor: '#fff', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}><div style={{ width: '100%', textAlign: 'left' }}>{item.doc}</div></td>
+                          <td
+                            style={{
+                              position: 'sticky',
+                              left: `${getLeftPosition(6)}px`,
+                              width: `${columnWidths[6]}px`,
+                              zIndex: 150,
+                              padding: '4px 0',
+                              textAlign: 'left',
+                              backgroundColor: item.docscani ? !item.flagtipopdf ? '#79c0f7' : '#c0f779' : '#fff',
+                              textOverflow: 'ellipsis',
+                              overflow: 'hidden',
+                              whiteSpace: 'nowrap',
+                              transition: 'background-color 0.2s',
+                              height: '38px',
+                            }}
+                          >
+                            <div style={{ width: '100%', textAlign: 'center' }}>{item.doc}</div>
+                          </td>
                           <td style={{ position: 'sticky', left: `${getLeftPosition(7)}px`, width: `${columnWidths[7]}px`, zIndex: 150, padding: '4px 0', textAlign: 'right', backgroundColor: '#fff' }}><div style={{ width: '100%', textAlign: 'right' }}>{Number(item.area).toFixed(2)}</div></td>
                           <td style={{ position: 'sticky', left: `${getLeftPosition(8)}px`, width: `${columnWidths[8]}px`, zIndex: 150, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff' }}><div style={{ width: '100%', textAlign: 'center' }}>{formatDate(item.dt)}</div></td>
                           <td style={{ position: 'sticky', left: `${getLeftPosition(9)}px`, width: `${columnWidths[9]}px`, zIndex: 150, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff' }}><div style={{ width: '100%', textAlign: 'center' }}>{formatDate(item.dtvenc)}</div></td>
                           <td style={{ position: 'sticky', left: `${getLeftPosition(10)}px`, width: `${columnWidths[10]}px`, zIndex: 150, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff' }}><div style={{ width: '100%', textAlign: 'center' }}>{formatDate(item.dtrenov)}</div></td>
                           <td style={{ position: 'sticky', left: `${getLeftPosition(11)}px`, width: `${columnWidths[11]}px`, zIndex: 150, padding: '4px 0', backgroundColor: '#d9d9d9' }}><div style={{ width: '1px', height: '100%', backgroundColor: '#000', margin: '0 auto' }}></div></td>
-                          <td style={{ width: `${columnWidths[12]}px`, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff' }}>{item.periodicidade}</td>
-                          <td style={{ width: `${columnWidths[13]}px`, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff' }}>{item.vgraurisco}</td>
-                          <td style={{ width: `${columnWidths[14]}px`, padding: '4px 0', textAlign: 'left', backgroundColor: '#fff' }}>{item.atividade}</td>
-                          <td style={{ width: `${columnWidths[15]}px`, padding: '4px 0', textAlign: 'left', backgroundColor: '#fff' }}>{item.obs}</td>
-                          <td style={{ width: `${columnWidths[16]}px`, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff' }}>{formatDate(item.quando)}</td>
-                          <td style={{ width: `${columnWidths[17]}px`, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff' }}>{item.grupo}</td>
-                          <td style={{ width: `${columnWidths[18]}px`, padding: '4px 0', textAlign: 'left', backgroundColor: '#fff' }}>{item.quem}</td>
-                          <td style={{ width: `${columnWidths[19]}px`, padding: '4px 0', textAlign: 'left', backgroundColor: '#fff' }}>{item.docorig}</td>
+                          <td style={{ width: `${columnWidths[12]}px`, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff', borderSpacing: '0 1px', borderColor: '#333' }}>{item.periodicidade}</td>
+                          <td style={{ width: `${columnWidths[13]}px`, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff', borderColor: '#333'  }}>{item.vgraurisco}</td>
+                          <td style={{ width: `${columnWidths[14]}px`, padding: '4px 0', textAlign: 'left', backgroundColor: '#fff', borderColor: '#333'  }}>{item.atividade}</td>
+                          <td style={{ width: `${columnWidths[15]}px`, padding: '4px 0', textAlign: 'left', backgroundColor: '#fff', borderColor: '#333'  }}>{item.obs}</td>
+                          <td style={{ width: `${columnWidths[16]}px`, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff', borderColor: '#333'  }}>{formatDate(item.quando)}</td>
+                          <td style={{ width: `${columnWidths[17]}px`, padding: '4px 0', textAlign: 'center', backgroundColor: '#fff', borderColor: '#333'  }}>{item.grupo}</td>
+                          <td style={{ width: `${columnWidths[18]}px`, padding: '4px 0', textAlign: 'left', backgroundColor: '#fff', borderColor: '#333'  }}>{item.quem}</td>
+                          <td style={{ width: `${columnWidths[19]}px`, padding: '4px 0', textAlign: 'left', backgroundColor: '#fff', borderColor: '#333'  }}>{item.docorig}</td>
                         </tr>
                       ))
                     )}

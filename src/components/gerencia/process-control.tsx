@@ -154,7 +154,7 @@ export default function ProcessControlPage() {
         </div>
 
         {/* Layout para telas menores que 1920px - cards empilhados */}
-        <div className="block 2xl:hidden">
+        <div className="2xl:hidden flex flex-col items-center justify-center">
           {/* Área superior: command panel + filter panel (empilhados) com altura fixa de 150px */}
           <div className="flex flex-col items-center gap-1 mb-1">
             <div className="w-full max-w-[940px] h-[150px] bg-card"> {/* Added bg-card */}
@@ -189,12 +189,12 @@ export default function ProcessControlPage() {
 
           {/* Área inferior: abas (largura total) com altura fixa de 400px */}
           {/* <div className="w-full max-h[19100] h-[400px]"> */}
-            <div className="w-full h-full bg-card"> {/* Added bg-card */}
-            <ProcessTabs
-              selectedClient={selectedClient}
-              selectedUnit={selectedUnit}
-            />
-          </div>
+            <div className="w-full h-full bg-card flex flex-col items-center justify-center"> {/* Centralizado sempre */}
+              {/* <ProcessTabs
+                selectedClient={selectedClient}
+                selectedUnit={selectedUnit}
+              /> */}
+            </div>
         </div>
       </div>
     </div>

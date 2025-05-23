@@ -180,14 +180,13 @@ export default function ProcessControlPage() {
               <TableFollowup codserv={selectedServicoCod} />
             </div>
           </div>
-
           {/* Área inferior: abas (largura total) com altura fixa de 400px */}
           {/* <div className="w-full max-h[19100] h-[400px]"> */}
             <div className="w-full h-full bg-card"> {/* Added bg-card */}
-            <ProcessTabs
+            {/* <ProcessTabs
               selectedClient={selectedClient}
               selectedUnit={selectedUnit}
-            />
+            /> */}
           </div>
         </div>
       </div>
