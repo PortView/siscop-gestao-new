@@ -190,10 +190,10 @@ export default function ProcessControlPage() {
           {/* Área inferior: abas (largura total) com altura fixa de 400px */}
           {/* <div className="w-full max-h[19100] h-[400px]"> */}
             <div className="w-full h-full bg-card flex flex-col items-center justify-center"> {/* Centralizado sempre */}
-              {/* <ProcessTabs
+              <ProcessTabs
                 selectedClient={selectedClient}
                 selectedUnit={selectedUnit}
-              /> */}
+              />
             </div>
         </div>
       </div>

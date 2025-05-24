@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { LOCAL_STORAGE_TOKEN_KEY } from '@/lib/constants';
+
 export default function LoginForm() {
   const [email, setEmail] = useState("mauro@ameni.com.br");
   const [password, setPassword] = useState("$Gbgb");
@@ -23,6 +25,10 @@ export default function LoginForm() {
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.message || "Usuário ou senha inválidos.");
+      }
+      const data = await res.json();
+      if (data.access_token) {
+        localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, data.access_token);
       }
       // Redireciona para a tela principal
       router.push("/");

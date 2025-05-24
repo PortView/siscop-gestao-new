@@ -113,28 +113,35 @@ export function ProcessCommandPanel({ onClientChange, onUnitChange }: ProcessCom
   }, []);
   
   // Query para carregar clientes (API real, sem mock, conforme consumo-de-apis.md)
+  // Estado local para o token
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Só roda no client
+    const storedToken = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
+    setToken(storedToken);
+    console.log('Token de acesso (useEffect):', storedToken);
+  }, []);
+
   const {
     data: clients = [],
     isLoading: isLoadingClients,
     isError: isErrorClients,
     error: clientsError
   } = useQuery<SiscopCliente[]>({
-    queryKey: ['siscop-clientes', codCoor],
+    queryKey: ['siscop-clientes', codCoor, token],
     queryFn: async () => {
+      console.log('Codcoor:', codCoor);
+      console.log('Token de acesso (queryFn):', token);
+
       if (!codCoor) return [];
-      const token = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
       if (!token) throw new Error('Token de acesso não encontrado.');
-      try {
-        // fetchClientes já envia o token e codcoor corretamente
-        const result = await fetchClientes(codCoor);
-        if (!Array.isArray(result)) throw new Error('Resposta inesperada da API de clientes.');
-        return result;
-      } catch (error: any) {
-        toast('Erro ao buscar clientes: ' + (error?.message || 'Erro desconhecido'), { variant: 'destructive' });
-        throw error;
-      }
+      // fetchClientes já envia o token e codcoor corretamente
+      const result = await fetchClientes(codCoor);
+      if (!Array.isArray(result)) throw new Error('Resposta inesperada da API de clientes.');
+      return result;
     },
-    enabled: !!codCoor,
+    enabled: !!codCoor && !!token,
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });

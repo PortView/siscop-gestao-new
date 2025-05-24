@@ -2,10 +2,19 @@
 
 // Utilitário para obter token do localStorage
 import { LOCAL_STORAGE_TOKEN_KEY } from '@/lib/constants';
+import { isJwtExpired } from '@/lib/jwt-utils';
 
 function getToken() {
   if (typeof window !== "undefined") {
-    return localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY) || "";
+    const token = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY) || "";
+    // Checa validade do token
+    if (token && isJwtExpired(token)) {
+      localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
+      // Redireciona para login se token expirou
+      window.location.href = '/login';
+      return "";
+    }
+    return token;
   }
   return "";
 }
