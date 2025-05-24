@@ -101,11 +101,19 @@ export function ProcessCommandPanel({ onClientChange, onUnitChange }: ProcessCom
       
       // Obter dados do usuário
       const userJson = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
-      if (!userJson) return;
+      if (!userJson) {
+        console.log('[ProcessCommandPanel] No user data found in localStorage.');
+        return;
+      }
       
       const userData = JSON.parse(userJson);
-      if (userData?.cod) {
-        setCodCoor(userData.cod);
+      // console.log('[ProcessCommandPanel] User data from localStorage:', userData); // DEBUG
+
+      if (userData?.codcoor) {
+        setCodCoor(userData.codcoor);
+        console.log('[ProcessCommandPanel] Token loaded:', token, 'CodCoor loaded:', userData.codcoor);
+      } else {
+        console.log('[ProcessCommandPanel] codcoor not found in user data. UserData:', userData);
       }
     } catch (e) {
       console.error('Erro ao carregar dados do usuário:', e);

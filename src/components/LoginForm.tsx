@@ -1,6 +1,8 @@
 "use client";
+"use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LOCAL_STORAGE_TOKEN_KEY, LOCAL_STORAGE_USER_KEY } from "@/lib/constants";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("mauro@ameni.com.br");
@@ -21,8 +23,22 @@ export default function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
       if (!res.ok) {
-        const errData = await res.json();
+        const errData = await res.json(); // Corrected: remove duplicate line
         throw new Error(errData.message || "Usuário ou senha inválidos.");
+      }
+      const data = await res.json();
+
+      if (!data.token) {
+        throw new Error("Token não recebido da API.");
+      }
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, data.token);
+        if (data.user && Object.keys(data.user).length > 0) { // Store only if user is not null or empty
+          localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(data.user));
+        } else {
+          localStorage.removeItem(LOCAL_STORAGE_USER_KEY); // Remove if user is null or empty
+        }
       }
       // Redireciona para a tela principal
       router.push("/");

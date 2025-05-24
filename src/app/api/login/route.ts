@@ -35,16 +35,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Token não recebido.' }, { status: 500 });
     }
 
-    // Setar cookie HttpOnly
-    const response = NextResponse.json({ success: true });
-    response.cookies.set('access-token', token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      secure: true,
-      maxAge: 60 * 60 * 8, // 8 horas
-    });
-    return response;
+    // Extrair detalhes do usuário
+    let user = null;
+    const userDataSource = apiBody.user || apiBody;
+
+    if (userDataSource) {
+      user = {
+        codcoor: userDataSource.cod,
+        nome: userDataSource.nome,
+        email: userDataSource.email,
+      };
+    }
+
+    // Retornar token e detalhes do usuário no corpo da resposta
+    return NextResponse.json({ success: true, token, user });
   } catch (error: any) {
     console.error('[API][LOGIN] Erro inesperado:', error);
     return NextResponse.json({ message: error?.message || 'Erro interno inesperado.' }, { status: 500 });
